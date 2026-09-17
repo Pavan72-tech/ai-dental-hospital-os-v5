@@ -1,0 +1,12 @@
+CREATE TABLE organizations (id SERIAL PRIMARY KEY, name VARCHAR(200) NOT NULL);
+CREATE TABLE branches (id SERIAL PRIMARY KEY, organization_id INT REFERENCES organizations(id), name VARCHAR(200) NOT NULL);
+CREATE TABLE users (id SERIAL PRIMARY KEY, branch_id INT REFERENCES branches(id), name VARCHAR(160) NOT NULL, email VARCHAR(180) UNIQUE NOT NULL, role VARCHAR(50) NOT NULL, password_hash VARCHAR(255));
+CREATE TABLE patients (id SERIAL PRIMARY KEY, branch_id INT REFERENCES branches(id), uhid VARCHAR(50) UNIQUE NOT NULL, name VARCHAR(160) NOT NULL, phone VARCHAR(30), email VARCHAR(180), medical_history TEXT, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP);
+CREATE TABLE appointments (id SERIAL PRIMARY KEY, patient_id INT REFERENCES patients(id), doctor_id INT REFERENCES users(id), starts_at TIMESTAMP NOT NULL, status VARCHAR(40) DEFAULT 'BOOKED', notes TEXT);
+CREATE TABLE teeth (id SERIAL PRIMARY KEY, patient_id INT REFERENCES patients(id), tooth_no VARCHAR(5) NOT NULL, condition VARCHAR(100), notes TEXT);
+CREATE TABLE treatment_plans (id SERIAL PRIMARY KEY, patient_id INT REFERENCES patients(id), title VARCHAR(200), amount NUMERIC(12,2), status VARCHAR(40) DEFAULT 'DRAFT');
+CREATE TABLE invoices (id SERIAL PRIMARY KEY, patient_id INT REFERENCES patients(id), invoice_no VARCHAR(60) UNIQUE, amount NUMERIC(12,2), paid NUMERIC(12,2) DEFAULT 0, status VARCHAR(30) DEFAULT 'UNPAID');
+CREATE TABLE inventory_items (id SERIAL PRIMARY KEY, branch_id INT REFERENCES branches(id), sku VARCHAR(80) UNIQUE, name VARCHAR(160), quantity INT DEFAULT 0, reorder_level INT DEFAULT 0);
+CREATE TABLE lab_cases (id SERIAL PRIMARY KEY, patient_id INT REFERENCES patients(id), case_no VARCHAR(60) UNIQUE, description TEXT, status VARCHAR(40) DEFAULT 'SENT_TO_LAB');
+CREATE TABLE ai_audit_logs (id SERIAL PRIMARY KEY, user_id INT REFERENCES users(id), patient_id INT REFERENCES patients(id), feature VARCHAR(100), input_summary TEXT, output_summary TEXT, reviewed BOOLEAN DEFAULT FALSE, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP);
+CREATE TABLE audit_logs (id SERIAL PRIMARY KEY, user_id INT REFERENCES users(id), action VARCHAR(100), entity VARCHAR(100), entity_id INT, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP);

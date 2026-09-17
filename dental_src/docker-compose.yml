@@ -1,0 +1,18 @@
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: dental_os
+      POSTGRES_USER: dental_user
+      POSTGRES_PASSWORD: change_me
+    ports: ["5432:5432"]
+    volumes: [pgdata:/var/lib/postgresql/data]
+  backend:
+    build: ./backend
+    ports: ["8000:8000"]
+    environment:
+      DATABASE_URL: postgresql+psycopg://dental_user:change_me@db:5432/dental_os
+      JWT_SECRET: change_me
+    depends_on: [db]
+volumes:
+  pgdata:
